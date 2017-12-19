@@ -3,6 +3,7 @@
 #include "Bridge.h"
 #include <QCryptographicHash>
 #include <QTextCodec>
+#include "Configuration.h"
 
 #define AF_INET6        23              // Internetwork Version 6
 typedef PCTSTR(__stdcall* INETNTOPW)(INT Family, PVOID pAddr, wchar_t* pStringBuf, size_t StringBufSize);

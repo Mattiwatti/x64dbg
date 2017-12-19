@@ -7,6 +7,7 @@
 #include "EntropyDialog.h"
 #include "LineEditDialog.h"
 #include "BrowseDialog.h"
+#include "SearchListView.h"
 #include <QVBoxLayout>
 #include <QProcess>
 #include <QFileDialog>
