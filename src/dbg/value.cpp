@@ -1944,18 +1944,32 @@ bool valfromstring_noexpr(const char* string, duint* value, bool silent, bool ba
     if(baseonly)
         return false;
 
+    const char* apiname = strchr(string, ':'); //the ':' character cannot be in a path: https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#naming_conventions
+    if(!apiname) //not found
+    {
+        apiname = strstr(string, "..") ? strchr(string, '.') : strrchr(string, '.'); //kernel32.GetProcAddress support
+        if(!apiname) //not found
+        {
+            apiname = strchr(string, '?'); //the '?' character cannot be in a path either
+        }
+    }
+    if(!apiname || strlen(apiname) == 0)
+        apiname = string;
+    else
+        apiname++;
+
     if(valapifromstring(string, value, value_size, true, silent, hexonly)) //then come APIs
         return true;
-    else if(LabelFromString(string, value)) //then come labels
+    else if(LabelFromString(apiname, value)) //then come labels
         return true;
-    else if(SymAddrFromName(string, value)) //then come symbols
+    else if(SymAddrFromName(apiname, value)) //then come symbols
         return true;
-    else if(strstr(string, "sub_") == string) //then come sub_ functions
+    else if(strstr(apiname, "sub_") == string) //then come sub_ functions
     {
 #ifdef _WIN64
-        bool result = sscanf_s(string, "sub_%llX", value) == 1;
+        bool result = sscanf_s(apiname, "sub_%llX", value) == 1;
 #else //x86
-        bool result = sscanf_s(string, "sub_%X", value) == 1;
+        bool result = sscanf_s(apiname, "sub_%X", value) == 1;
 #endif //_WIN64
         duint start;
         return result && FunctionGet(*value, &start, nullptr) && *value == start;
